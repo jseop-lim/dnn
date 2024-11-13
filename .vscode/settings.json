@@ -1,0 +1,10 @@
+{
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff"
+    },
+    "flake8.importStrategy": "fromEnvironment",
+    "flake8.args": [
+        "--ignore=E203",
+        "--max-length=88"
+    ]
+}
