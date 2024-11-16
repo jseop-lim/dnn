@@ -9,4 +9,7 @@ repos:
   rev: v0.6.5
   hooks:
     - id: ruff
+    - id: ruff
+      name: isort
+      args: ["--select", "I", "--fix"]
     - id: ruff-format

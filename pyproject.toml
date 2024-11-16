@@ -33,3 +33,6 @@ plugins = ["numpy.typing.mypy_plugin"]
 [tool.ruff]
 line-length = 88
 target-version = "py312"
+
+[tool.ruff.lint]
+extend-select = ["I"]
