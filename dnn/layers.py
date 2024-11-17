@@ -61,7 +61,7 @@ class LinearLayer:
 
         batch_size, _ = dLdy.shape
         self.dLdW = dLdy.T @ self.x / batch_size
-        self.dLdb = dLdy.mean(axis=0, keepdims=True)  # TODO: 검토 필요
+        self.dLdb = dLdy.mean(axis=0, keepdims=True)
         dLdx: NDArray[np.float64] = dLdy @ self.W
         return dLdx
 
