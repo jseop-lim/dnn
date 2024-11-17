@@ -17,6 +17,7 @@ class LinearLayer:
     b: NDArray[np.float64]  # shape = (O, 1)
     dLdW: NDArray[np.float64]  # shape = (O, I)
     dLdb: NDArray[np.float64]  # shape = (1, O)
+    # Warning: The shapes of b and dLdb are transposed.
 
     def __init__(self, input_size: int, output_size: int, std: float = 0.01) -> None:
         """Initialize the weights and biases of the linear layer.
