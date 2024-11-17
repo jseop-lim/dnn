@@ -18,6 +18,10 @@ mypy = "^1.11.2"
 pytest = "^8.3.3"
 ipykernel = "^6.29.5"
 
+
+[tool.poetry.group.gpu.dependencies]
+cupy = "^13.3.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
