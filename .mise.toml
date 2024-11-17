@@ -2,5 +2,6 @@
 python = "3.12.6"
 
 [env]
+DEVICE = "cpu"
 TRAIN_DATA_PATH = "./data/train.txt"
 TEST_DATA_PATH = "./data/test.txt"
