@@ -28,4 +28,10 @@ def plot_line_graphs(
 
 def parse_file_to_array(filepath: Path) -> NDArray[np.float64]:
     """Parse a file with space-separated integers into a numpy array."""
-    return np.loadtxt(filepath, dtype=np.float64)
+    return np.loadtxt(filepath, dtype=np.float64)  # type: ignore
+
+
+def print_shape(**kwargs: NDArray[np.generic]) -> None:
+    for key, value in kwargs.items():
+        print(f"{key}: {value.shape}", end=", ")
+    print()
