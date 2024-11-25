@@ -113,4 +113,19 @@ class SigmoidLayer(NNLayer):
         return y
 
 
+class ReLULayer(NNLayer):
+    def _forward(self) -> NDArray[np.float64]:
+        return self.relu(self.x)
+
+    def _backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
+        dLdx: NDArray[np.float64] = dLdy * (self.x > 0)
+        return dLdx
+
+    @staticmethod
+    def relu(x: NDArray[np.float64]) -> NDArray[np.float64]:
+        """Compute the ReLU function element-wise."""
+        y: NDArray[np.float64] = np.maximum(0, x)
+        return y
+
+
 # DP나 BFS 이용해서 gradient 구하고, 가중치 갱신하자.
