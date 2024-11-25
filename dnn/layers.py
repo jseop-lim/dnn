@@ -79,4 +79,41 @@ class LinearLayer:
         self.b -= lr * self.dLdb.T
 
 
+class SigmoidLayer:
+    x: NDArray[np.float64]  # shape = (B, I)
+
+    def forward(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        """Feed forward for a batch of inputs.
+
+        Args:
+            x: The input to the layer. shape = (B, I)
+
+        Returns:
+            y: The output of the layer. shape = (B, I)
+        """
+        return self.sigmoid(x)
+
+    def backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
+        """Error back-propagation for a batch of inputs.
+
+        Args:
+            dLdy: The differential of the loss w.r.t. the output of the layer. shape = (B, I)
+
+        Returns:
+            dLdx: The differential of the loss w.r.t. the input to the layer. shape = (B, I)
+        """
+        if not hasattr(self, "y"):
+            raise RuntimeError("forward() must be called before backward().")
+
+        y = self.sigmoid(self.x)
+        dLdx: NDArray[np.float64] = dLdy * y * (1 - y)
+        return dLdx
+
+    @staticmethod
+    def sigmoid(x: NDArray[np.float64]) -> NDArray[np.float64]:
+        """Compute the sigmoid function element-wise."""
+        y: NDArray[np.float64] = 1 / (1 + np.exp(-x))
+        return y
+
+
 # DP나 BFS 이용해서 gradient 구하고, 가중치 갱신하자.
