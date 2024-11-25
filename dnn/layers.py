@@ -27,6 +27,7 @@ class LinearLayer:
             output_size: The number of output features.
             std: The standard deviation of the normal distribution used to initialize the weights and biases.
         """
+        # TODO: feature 변동폭 일정하도록 초기화 방법 수정
         self.W: NDArray[np.float64] = np.random.normal(
             0, std, (output_size, input_size)
         )
