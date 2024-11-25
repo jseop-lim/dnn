@@ -6,13 +6,53 @@ Symbols used for size of dimensions:
     O: output size
 """
 
+from abc import ABC, abstractmethod
+
 from numpy.typing import NDArray
 
 from dnn.libs import np
 
 
-class LinearLayer:
+class NNLayer(ABC):
     x: NDArray[np.float64]  # shape = (B, I)
+
+    def forward(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        """Feed forward for a batch of inputs.
+
+        Args:
+            x: The input to the layer. shape = (B, I)
+
+        Returns:
+            y: The output of the layer. shape = (B, O)
+        """
+        self.x = x
+        return self._forward()
+
+    def backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
+        """Error back-propagation for a batch of inputs.
+
+        Args:
+            dLdy: The differential of the loss w.r.t. the output of the layer. shape = (B, O)
+                transpose of the upstream gradient
+
+        Returns:
+            dLdx: The differential of the loss w.r.t. the input to the layer. shape = (B, I)
+                transpose of the downstream gradient
+        """
+        if not hasattr(self, "x"):
+            raise RuntimeError("forward() must be called before backward().")
+        return self._backward(dLdy)
+
+    @abstractmethod
+    def _forward(self) -> NDArray[np.float64]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def _backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
+        raise NotImplementedError
+
+
+class LinearLayer(NNLayer):
     W: NDArray[np.float64]  # shape = (O, I)
     b: NDArray[np.float64]  # shape = (O, 1)
     dLdW: NDArray[np.float64]  # shape = (O, I)
@@ -33,33 +73,11 @@ class LinearLayer:
         )
         self.b: NDArray[np.float64] = np.random.normal(0, std, (output_size, 1))
 
-    def forward(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Feed forward for a batch of inputs.
-
-        Args:
-            x: The input to the layer. shape = (B, I)
-
-        Returns:
-            y: The output of the layer. shape = (B, O)
-        """
-        self.x = x
-        y: NDArray[np.float64] = (self.W @ x.T + self.b).T
+    def _forward(self) -> NDArray[np.float64]:
+        y: NDArray[np.float64] = (self.W @ self.x.T + self.b).T
         return y
 
-    def backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Error back-propagation for a batch of inputs.
-
-        Args:
-            dLdy: The differential of the loss w.r.t. the output of the layer. shape = (B, O)
-                transpose of the upstream gradient
-
-        Returns:
-            dLdx: The differential of the loss w.r.t. the input to the layer. shape = (B, I)
-                transpose of the downstream gradient
-        """
-        if not hasattr(self, "x"):
-            raise RuntimeError("forward() must be called before backward().")
-
+    def _backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
         batch_size, _ = dLdy.shape
         self.dLdW = dLdy.T @ self.x / batch_size
         self.dLdb = dLdy.mean(axis=0, keepdims=True)
@@ -79,32 +97,11 @@ class LinearLayer:
         self.b -= lr * self.dLdb.T
 
 
-class SigmoidLayer:
-    x: NDArray[np.float64]  # shape = (B, I)
+class SigmoidLayer(NNLayer):
+    def _forward(self) -> NDArray[np.float64]:
+        return self.sigmoid(self.x)
 
-    def forward(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Feed forward for a batch of inputs.
-
-        Args:
-            x: The input to the layer. shape = (B, I)
-
-        Returns:
-            y: The output of the layer. shape = (B, I)
-        """
-        return self.sigmoid(x)
-
-    def backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Error back-propagation for a batch of inputs.
-
-        Args:
-            dLdy: The differential of the loss w.r.t. the output of the layer. shape = (B, I)
-
-        Returns:
-            dLdx: The differential of the loss w.r.t. the input to the layer. shape = (B, I)
-        """
-        if not hasattr(self, "y"):
-            raise RuntimeError("forward() must be called before backward().")
-
+    def _backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
         y = self.sigmoid(self.x)
         dLdx: NDArray[np.float64] = dLdy * y * (1 - y)
         return dLdx
