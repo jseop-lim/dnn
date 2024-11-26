@@ -102,7 +102,7 @@ class SigmoidLayer(NNLayer):
         return self.sigmoid(self.x)
 
     def _backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
-        y = self.sigmoid(self.x)
+        y = self.sigmoid(self.x)  # shape = (B, I)
         dLdx: NDArray[np.float64] = dLdy * y * (1 - y)
         return dLdx
 
@@ -125,6 +125,26 @@ class ReLULayer(NNLayer):
     def relu(x: NDArray[np.float64]) -> NDArray[np.float64]:
         """Compute the ReLU function element-wise."""
         y: NDArray[np.float64] = np.maximum(0, x)
+        return y
+
+
+class SoftmaxLayer(NNLayer):
+    def _forward(self) -> NDArray[np.float64]:
+        return self.softmax(self.x)
+
+    def _backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
+        y = self.softmax(self.x)  # shape = (B, I)
+        dydx = np.array(
+            [np.diagflat(row) - np.outer(row, row) for row in y]
+        )  # shape = (B, I, I)
+        dLdx: NDArray[np.float64] = np.einsum("bij,bj->bi", dydx, dLdy)
+        return dLdx
+
+    @staticmethod
+    def softmax(x: NDArray[np.float64]) -> NDArray[np.float64]:
+        """Compute the softmax function element-wise for each row."""
+        y_numerator: NDArray[np.float64] = np.exp(x - x.max(axis=1, keepdims=True))
+        y: NDArray[np.float64] = y_numerator / y_numerator.sum(axis=1, keepdims=True)
         return y
 
 
