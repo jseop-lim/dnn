@@ -8,9 +8,9 @@ from dnn.libs import np
 class LossFunction(ABC):
     # NOTE: y는 loss function의 input이지만 NN model의 output이므로 y로 표기
     y: NDArray[np.float64]  # shape = (B, I)
-    r: NDArray[np.float64]  # shape = (B, 1)
+    r: NDArray[np.uint8]  # shape = (B, 1)
 
-    def forward(self, y: NDArray[np.float64], r: NDArray[np.float64]) -> np.float64:
+    def forward(self, y: NDArray[np.float64], r: NDArray[np.uint8]) -> np.float64:
         """Compute the loss for a batch of outputs.
 
         Args:

@@ -9,13 +9,13 @@ from dnn.libs import np
 
 class Dataset(NamedTuple):
     x: NDArray[np.float64]  # shape = (B, I)
-    r: NDArray[np.float64]  # shape = (B, 1)
+    r: NDArray[np.uint8]  # shape = (B, 1)
 
 
 def load_dataset(filepath: Path) -> Dataset:
     """Load a dataset from files."""
     data = _parse_file_to_array(filepath)
-    return Dataset(data[:, :-1], data[:, -1].reshape(-1, 1))
+    return Dataset(data[:, :-1], data[:, -1].reshape(-1, 1).astype(np.uint8))
 
 
 def _parse_file_to_array(filepath: Path) -> NDArray[np.float64]:

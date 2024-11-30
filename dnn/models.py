@@ -9,6 +9,7 @@ from dnn.libs import np
 from dnn.losses import LossFunction
 
 
+# Deprecated
 def train_mini_batch_sgd(
     models: list[NNLayer],
     loss: LossFunction,
@@ -85,7 +86,7 @@ class MiniBatchSgdNNClassifier:
         posteriors = reduce(
             lambda x, layer: layer.forward(x), self.layers, x
         )  # shape = (B, O)
-        y: NDArray[np.float64] = posteriors.argmax(axis=1).reshape(
+        predicted_r: NDArray[np.float64] = posteriors.argmax(axis=1).reshape(
             -1, 1
         )  # shape = (B, 1)
-        return y
+        return predicted_r

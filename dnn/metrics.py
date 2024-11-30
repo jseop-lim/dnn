@@ -4,8 +4,8 @@ from dnn.libs import np
 
 
 def compute_error_rate(
-    predicted: NDArray[np.float64],
-    true: NDArray[np.float64],
+    predicted: NDArray[np.uint8],
+    true: NDArray[np.uint8],
 ) -> float:
     """Compute the error rate of the predicted labels.
 
