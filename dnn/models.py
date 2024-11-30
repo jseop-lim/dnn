@@ -34,7 +34,7 @@ def train_mini_batch_sgd(
 
 # TODO: Model 추상 클래스를 상속받도록 리팩터링
 # TODO: dataclass 적용
-class MiniBatchNNClassifier:
+class MiniBatchSgdNNClassifier:
     layers: list[NNLayer]  # ordered from deepest hidden layer to output layer
     loss_func: LossFunction
     lr: float
