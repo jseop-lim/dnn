@@ -41,14 +41,14 @@ def generate_random_batches(
     data: NDArray[np.float64],
     batch_size: int,
 ) -> Iterator[Batch]:
-    """Generate random mini-batches from the data."""
+    """Generate random batches from the data."""
     data_size, _ = data.shape
     indices = np.random.permutation(data_size)
-    for start_idx in range(0, data_size, batch_size):
-        end_idx = min(start_idx + batch_size, data_size)
-        batch_indices = indices[start_idx:end_idx]
+    for i in range(0, data_size, batch_size):
+        batch_indices = indices[i : i + batch_size]
         yield Batch(
-            data[batch_indices][:, :-1], data[batch_indices][:, -1:].reshape(-1, 1)
+            data[batch_indices][:, :-1],
+            data[batch_indices][:, -1:].reshape(-1, 1),
         )
 
 
