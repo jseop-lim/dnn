@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from pathlib import Path
 
 from matplotlib import pyplot as plt
@@ -29,6 +29,17 @@ def plot_line_graphs(
 def parse_file_to_array(filepath: Path) -> NDArray[np.float64]:
     """Parse a file with space-separated integers into a numpy array."""
     return np.loadtxt(filepath, dtype=np.float64)  # type: ignore
+
+
+def generate_random_mini_batches(
+    data: NDArray[np.float64],
+    batch_size: int,
+) -> Iterator[NDArray[np.float64]]:
+    """Generate random mini-batches from the data."""
+    data_size, _ = data.shape
+    indices = np.random.permutation(data_size)
+    for i in range(0, data_size, batch_size):
+        yield data[indices[i : i + batch_size]]
 
 
 def print_shape(**kwargs: NDArray[np.generic]) -> None:
