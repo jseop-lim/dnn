@@ -99,7 +99,7 @@ class LinearLayer(NNLayer):
 
 class SigmoidLayer(NNLayer):
     def _forward(self) -> NDArray[np.float64]:
-        return self.sigmoid(self.x)
+        return self.sigmoid(self.x)  # shape = (B, I)
 
     def _backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
         y = self.sigmoid(self.x)  # shape = (B, I)
@@ -115,7 +115,7 @@ class SigmoidLayer(NNLayer):
 
 class ReLULayer(NNLayer):
     def _forward(self) -> NDArray[np.float64]:
-        return self.relu(self.x)
+        return self.relu(self.x)  # shape = (B, I)
 
     def _backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
         dLdx: NDArray[np.float64] = dLdy * (self.x > 0)
@@ -130,7 +130,7 @@ class ReLULayer(NNLayer):
 
 class SoftmaxLayer(NNLayer):
     def _forward(self) -> NDArray[np.float64]:
-        return self.softmax(self.x)
+        return self.softmax(self.x)  # shape = (B, I)
 
     def _backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
         y = self.softmax(self.x)  # shape = (B, I)
@@ -159,9 +159,10 @@ class CrossEntropyLayer(NNLayer):
         loss: NDArray[np.float64] = (
             np.sum(-np.log(self.x[range(batch_size), self.r.flatten()])) / batch_size
         )
-        return loss
+        return loss  # shape = (1,)
 
-    def _backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
+    def backward(self, dLdy: NDArray[np.float64] | None = None) -> np.float64:
+        # TODO: ISP 위반하므로 NNLayer 상속하지 않도록 리팩터링
         batch_size, input_size = self.x.shape
         indicator: NDArray[np.float64] = np.eye(input_size)[
             self.r.flatten()
@@ -171,6 +172,9 @@ class CrossEntropyLayer(NNLayer):
         ].reshape(-1, 1)  # shape = (B, 1)
         dLdx: NDArray[np.float64] = -indicator / posteriors / batch_size
         return dLdx
+
+    def _backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
+        pass
 
 
 # DP나 BFS 이용해서 gradient 구하고, 가중치 갱신하자.
