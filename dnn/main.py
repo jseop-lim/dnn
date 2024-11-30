@@ -15,6 +15,8 @@ if not (test_data_path := os.getenv("TEST_DATA_PATH")):
     raise ValueError("TEST_DATA_PATH environment variable is not set")
 
 train_data: Dataset = load_dataset(Path(train_data_path))
+# temp
+train_data = Dataset(train_data.x[:10000], train_data.r[:10000])
 test_data: Dataset = load_dataset(Path(test_data_path))
 
 train_data_size, input_size = train_data.x.shape
@@ -51,9 +53,15 @@ model = MiniBatchSgdNNClassifier(
     ],
     loss_func=CrossEntropyLoss(),
 )
-loss_per_epoch = np.nanmean(model.train(train_data), axis=1)
+loss_per_epoch = model.train(train_data)
 
+print("Training started.")
 print("Training complete.")
+for epoch, loss in enumerate(loss_per_epoch[::10], 1):
+    print(f"Epoch {epoch}, Loss: {loss}")
+
+print("--------------------")
+print("Prediction started.")
 
 test_predicted_r = model.predict(test_data.x).astype(np.uint8)
 error_rate: float = compute_error_rate(predicted=test_predicted_r, true=test_data.r)
