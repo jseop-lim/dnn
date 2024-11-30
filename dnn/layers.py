@@ -52,6 +52,44 @@ class NNLayer(ABC):
         raise NotImplementedError
 
 
+class LossFunction(ABC):
+    x: NDArray[np.float64]  # shape = (B, I)
+    r: NDArray[np.float64]  # shape = (B, 1)
+
+    def forward(self, x: NDArray[np.float64], r: NDArray[np.float64]) -> np.float64:
+        """Compute the loss for a batch of inputs.
+
+        Args:
+            x: The input to the loss function. shape = (B, I)
+            r: The target labels. shape = (B, 1)
+
+        Returns:
+            loss: The loss value. shape = (1,)
+        """
+        self.x = x
+        self.r = r
+        return self._forward()
+
+    def backward(self) -> NDArray[np.float64]:
+        """Error back-propagation for a batch of inputs.
+
+        Returns:
+            dLdx: The differential of the loss w.r.t. the input to the loss function. shape = (B, I)
+                transpose of the downstream gradient
+        """
+        if not hasattr(self, "x"):
+            raise RuntimeError("forward() must be called before backward().")
+        return self._backward()
+
+    @abstractmethod
+    def _forward(self) -> np.float64:
+        raise NotImplementedError
+
+    @abstractmethod
+    def _backward(self) -> NDArray[np.float64]:
+        raise NotImplementedError
+
+
 class LinearLayer(NNLayer):
     W: NDArray[np.float64]  # shape = (O, I)
     b: NDArray[np.float64]  # shape = (O, 1)
