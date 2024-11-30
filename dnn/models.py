@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from functools import reduce
 
 from numpy.typing import NDArray
@@ -33,27 +34,13 @@ def train_mini_batch_sgd(
 
 
 # TODO: Model 추상 클래스를 상속받도록 리팩터링
-# TODO: dataclass 적용
+@dataclass
 class MiniBatchSgdNNClassifier:
     layers: list[NNLayer]  # ordered from deepest hidden layer to output layer
     loss_func: LossFunction
-    lr: float
-    max_epoch: int
-    batch_size: int
-
-    def __init__(
-        self,
-        layers: list[NNLayer],
-        loss_func: LossFunction,
-        lr: float = 0.1,
-        max_epoch: int = 100,
-        batch_size: int = 32,
-    ):
-        self.layers = layers
-        self.loss_func = loss_func
-        self.lr = lr
-        self.max_epoch = max_epoch
-        self.batch_size = batch_size
+    lr: float = 0.1
+    max_epoch: int = 100
+    batch_size: int = 32
 
     def train(self, dataset: Dataset) -> NDArray[np.float64]:
         """Train the neural network model using mini-batch stochastic gradient descent.
