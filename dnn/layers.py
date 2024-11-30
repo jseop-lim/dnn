@@ -51,6 +51,15 @@ class NNLayer(ABC):
     def _backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
         raise NotImplementedError
 
+    @abstractmethod
+    def update_weights(self, lr: float) -> None:
+        """Update the parameters of the layer.
+
+        Args:
+            lr: The learning rate.
+        """
+        raise NotImplementedError
+
 
 class LossFunction(ABC):
     # NOTE: y는 loss function의 input이지만 NN model의 output이므로 y로 표기
@@ -145,6 +154,9 @@ class SigmoidLayer(NNLayer):
         dLdx: NDArray[np.float64] = dLdy * y * (1 - y)
         return dLdx
 
+    def update_weights(self, lr: float) -> None:
+        pass
+
     @staticmethod
     def sigmoid(x: NDArray[np.float64]) -> NDArray[np.float64]:
         """Compute the sigmoid function element-wise."""
@@ -159,6 +171,9 @@ class ReLULayer(NNLayer):
     def _backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
         dLdx: NDArray[np.float64] = dLdy * (self.x > 0)
         return dLdx
+
+    def update_weights(self, lr: float) -> None:
+        pass
 
     @staticmethod
     def relu(x: NDArray[np.float64]) -> NDArray[np.float64]:
@@ -178,6 +193,9 @@ class SoftmaxLayer(NNLayer):
         )  # shape = (B, I, I)
         dLdx: NDArray[np.float64] = np.einsum("bij,bj->bi", dydx, dLdy)
         return dLdx
+
+    def update_weights(self, lr: float) -> None:
+        pass
 
     @staticmethod
     def softmax(x: NDArray[np.float64]) -> NDArray[np.float64]:
