@@ -1,5 +1,6 @@
 from collections.abc import Iterator, Sequence
 from pathlib import Path
+from typing import NamedTuple
 
 from matplotlib import pyplot as plt
 from numpy.typing import NDArray
@@ -31,15 +32,24 @@ def parse_file_to_array(filepath: Path) -> NDArray[np.float64]:
     return np.loadtxt(filepath, dtype=np.float64)  # type: ignore
 
 
-def generate_random_mini_batches(
+class Batch(NamedTuple):
+    x: NDArray[np.float64]  # shape = (B, I)
+    r: NDArray[np.float64]  # shape = (B, 1)
+
+
+def generate_random_batches(
     data: NDArray[np.float64],
     batch_size: int,
-) -> Iterator[NDArray[np.float64]]:
+) -> Iterator[Batch]:
     """Generate random mini-batches from the data."""
     data_size, _ = data.shape
     indices = np.random.permutation(data_size)
-    for i in range(0, data_size, batch_size):
-        yield data[indices[i : i + batch_size]]
+    for start_idx in range(0, data_size, batch_size):
+        end_idx = min(start_idx + batch_size, data_size)
+        batch_indices = indices[start_idx:end_idx]
+        yield Batch(
+            data[batch_indices][:, :-1], data[batch_indices][:, -1:].reshape(-1, 1)
+        )
 
 
 def print_shape(**kwargs: NDArray[np.generic]) -> None:
