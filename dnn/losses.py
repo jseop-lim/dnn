@@ -47,6 +47,7 @@ class LossFunction(ABC):
 class CrossEntropyLoss(LossFunction):
     def _forward(self) -> np.float64:
         batch_size, _ = self.y.shape
+        # TODO: np.mean() 대신 np.sum()으로 바꿔보기
         loss: np.float64 = np.mean(-np.log(self.y[range(batch_size), self.r.flatten()]))
         return loss  # shape = (1,)
 
