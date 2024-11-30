@@ -12,7 +12,13 @@ class Dataset(NamedTuple):
     r: NDArray[np.float64]  # shape = (B, 1)
 
 
-def parse_file_to_array(filepath: Path) -> NDArray[np.float64]:
+def load_dataset(filepath: Path) -> Dataset:
+    """Load a dataset from files."""
+    data = _parse_file_to_array(filepath)
+    return Dataset(data[:, :-1], data[:, -1].reshape(-1, 1))
+
+
+def _parse_file_to_array(filepath: Path) -> NDArray[np.float64]:
     """Parse a file with space-separated integers into a numpy array."""
     return np.loadtxt(filepath, dtype=np.float64)  # type: ignore
 
