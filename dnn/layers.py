@@ -53,31 +53,32 @@ class NNLayer(ABC):
 
 
 class LossFunction(ABC):
-    x: NDArray[np.float64]  # shape = (B, I)
+    # NOTE: y는 loss function의 input이지만 NN model의 output이므로 y로 표기
+    y: NDArray[np.float64]  # shape = (B, I)
     r: NDArray[np.float64]  # shape = (B, 1)
 
-    def forward(self, x: NDArray[np.float64], r: NDArray[np.float64]) -> np.float64:
-        """Compute the loss for a batch of inputs.
+    def forward(self, y: NDArray[np.float64], r: NDArray[np.float64]) -> np.float64:
+        """Compute the loss for a batch of outputs.
 
         Args:
-            x: The input to the loss function. shape = (B, I)
+            y: The predicted outputs. shape = (B, I)
             r: The target labels. shape = (B, 1)
 
         Returns:
             loss: The loss value. shape = (1,)
         """
-        self.x = x
+        self.y = y
         self.r = r
         return self._forward()
 
     def backward(self) -> NDArray[np.float64]:
-        """Error back-propagation for a batch of inputs.
+        """Error back-propagation for a batch of outputs.
 
         Returns:
-            dLdx: The differential of the loss w.r.t. the input to the loss function. shape = (B, I)
+            dLdy: The differential of the loss w.r.t. the output to the layer. shape = (B, I)
                 transpose of the downstream gradient
         """
-        if not hasattr(self, "x"):
+        if not hasattr(self, "y"):
             raise RuntimeError("forward() must be called before backward().")
         return self._backward()
 
@@ -186,33 +187,22 @@ class SoftmaxLayer(NNLayer):
         return y
 
 
-class CrossEntropyLayer(NNLayer):
-    r: NDArray[np.float64]  # shape = (B, 1)
-
-    def __init__(self, r: NDArray[np.float64]) -> None:
-        self.r = r
-
-    def _forward(self) -> NDArray[np.float64]:
-        batch_size, _ = self.x.shape
-        loss: NDArray[np.float64] = (
-            np.sum(-np.log(self.x[range(batch_size), self.r.flatten()])) / batch_size
-        )
+class CrossEntropyLayer(LossFunction):
+    def _forward(self) -> np.float64:
+        batch_size, _ = self.y.shape
+        loss: np.float64 = np.mean(-np.log(self.y[range(batch_size), self.r.flatten()]))
         return loss  # shape = (1,)
 
-    def backward(self, dLdy: NDArray[np.float64] | None = None) -> np.float64:
-        # TODO: ISP 위반하므로 NNLayer 상속하지 않도록 리팩터링
-        batch_size, input_size = self.x.shape
+    def _backward(self) -> NDArray[np.float64]:
+        batch_size, input_size = self.y.shape
         indicator: NDArray[np.float64] = np.eye(input_size)[
             self.r.flatten()
         ]  # shape = (B, I)
-        posteriors: NDArray[np.float64] = self.x[
+        posteriors: NDArray[np.float64] = self.y[
             range(batch_size), self.r.flatten()
         ].reshape(-1, 1)  # shape = (B, 1)
-        dLdx: NDArray[np.float64] = -indicator / posteriors / batch_size
-        return dLdx
-
-    def _backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
-        pass
+        dLdy: NDArray[np.float64] = -indicator / posteriors / batch_size
+        return dLdy
 
 
 # DP나 BFS 이용해서 gradient 구하고, 가중치 갱신하자.
