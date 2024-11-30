@@ -53,7 +53,7 @@ class MiniBatchSgdNNClassifier:
             losses: The loss values for each weight update. shape = (max_epoch, num_batches)
                 if num_batches is not a multiple of batch_size, the last row will be padded with np.nan
         """
-        num_batches = len(dataset.x) // self.batch_size
+        num_batches = len(dataset.x) // self.batch_size + 1
         losses: NDArray[np.float64] = np.full((self.max_epoch, num_batches), np.nan)
         # TODO: max_epoch 대신 수렴 조건 판별하여 종료하도록 수정
         for epoch in range(self.max_epoch):
