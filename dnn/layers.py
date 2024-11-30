@@ -148,4 +148,29 @@ class SoftmaxLayer(NNLayer):
         return y
 
 
+class CrossEntropyLayer(NNLayer):
+    r: NDArray[np.float64]  # shape = (B, 1)
+
+    def __init__(self, r: NDArray[np.float64]) -> None:
+        self.r = r
+
+    def _forward(self) -> NDArray[np.float64]:
+        batch_size, _ = self.x.shape
+        loss: NDArray[np.float64] = (
+            np.sum(-np.log(self.x[range(batch_size), self.r.flatten()])) / batch_size
+        )
+        return loss
+
+    def _backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
+        batch_size, input_size = self.x.shape
+        indicator: NDArray[np.float64] = np.eye(input_size)[
+            self.r.flatten()
+        ]  # shape = (B, I)
+        posteriors: NDArray[np.float64] = self.x[
+            range(batch_size), self.r.flatten()
+        ].reshape(-1, 1)  # shape = (B, 1)
+        dLdx: NDArray[np.float64] = -indicator / posteriors / batch_size
+        return dLdx
+
+
 # DP나 BFS 이용해서 gradient 구하고, 가중치 갱신하자.
