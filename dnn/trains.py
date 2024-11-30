@@ -32,6 +32,8 @@ def train_mini_batch_sgd(
     print("Training complete.")
 
 
+# TODO: Model 추상 클래스를 상속받도록 리팩터링
+# TODO: dataclass 적용
 class MiniBatchNNClassifier:
     layers: list[NNLayer]  # ordered from deepest hidden layer to output layer
     loss_func: LossFunction
@@ -64,6 +66,7 @@ class MiniBatchNNClassifier:
         """
         num_batches = len(dataset.x) // self.batch_size
         losses: NDArray[np.float64] = np.zeros(self.max_epoch * num_batches)
+        # TODO: max_epoch 대신 수렴 조건 판별하여 종료하도록 수정
         for epoch in range(self.max_epoch):
             for i, batch in enumerate(
                 generate_random_batches(dataset, self.batch_size)
