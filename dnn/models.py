@@ -42,6 +42,7 @@ class MiniBatchSgdNNClassifier:
     lr: float = 0.1
     max_epoch: int = 100
     batch_size: int = 32
+    threshold: float = 1e-3
 
     def train(self, dataset: Dataset) -> NDArray[np.float64]:
         """Train the neural network model using mini-batch stochastic gradient descent.
@@ -65,6 +66,8 @@ class MiniBatchSgdNNClassifier:
                     y=reduce(lambda x, layer: layer.forward(x), self.layers, batch.x),
                     r=batch.r,
                 )
+                if losses[epoch, i] < self.threshold:
+                    break
                 reduce(
                     lambda dLdy, layer: layer.backward(dLdy),
                     reversed(self.layers),
