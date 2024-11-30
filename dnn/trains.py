@@ -62,10 +62,14 @@ class MiniBatchNNClassifier:
         Returns:
             losses: The loss values for each weight update. shape = (max_epoch,)
         """
-        losses: NDArray[np.float64] = np.zeros(self.max_epoch)
-        for epoch in range(1, self.max_epoch + 1):
-            for batch in generate_random_batches(dataset, self.batch_size):
-                losses[batch] = self.loss_func.forward(
+        num_batches = len(dataset.x) // self.batch_size
+        losses: NDArray[np.float64] = np.zeros(self.max_epoch * num_batches)
+        for epoch in range(self.max_epoch):
+            for i, batch in enumerate(
+                generate_random_batches(dataset, self.batch_size)
+            ):
+                # XXX: losses의 index 시작 번호를 1로 맞추기 위해 +1 적용. 그래프 그려보고 판단
+                losses[epoch * num_batches + i] = self.loss_func.forward(
                     y=reduce(lambda x, layer: layer.forward(x), self.layers, batch.x),
                     r=batch.r,
                 )
