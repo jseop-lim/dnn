@@ -51,31 +51,36 @@ class MiniBatchSgdNNClassifier:
             dataset: The training dataset. x shape = (B, I), r shape = (B, 1)
 
         Returns:
-            losses: The loss values for each weight update. shape = (max_epoch, num_batches)
-                if num_batches is not a multiple of batch_size, the last row will be padded with np.nan
+            losses: The loss values for each epoch. shape = (final_epoch,)
         """
         num_batches = len(dataset.x) // self.batch_size + 1
-        losses: NDArray[np.float64] = np.full((self.max_epoch, num_batches), np.nan)
-        # TODO: max_epoch 대신 수렴 조건 판별하여 종료하도록 수정
+        loss_per_update = np.full((self.max_epoch, num_batches), np.nan)
+
         for epoch in range(self.max_epoch):
             for i, batch in enumerate(
                 generate_random_batches(dataset, self.batch_size)
             ):
-                # XXX: losses의 index 시작 번호를 1로 맞추기 위해 +1 적용. 그래프 그려보고 판단
-                losses[epoch, i] = self.loss_func.forward(
+                # feed forward
+                loss_per_update[epoch, i] = self.loss_func.forward(
                     y=reduce(lambda x, layer: layer.forward(x), self.layers, batch.x),
                     r=batch.r,
                 )
-                if losses[epoch, i] < self.threshold:
+                # check convergence
+                if loss_per_update[epoch, i] < self.threshold:
                     break
+                # error back-propagation
                 reduce(
                     lambda dLdy, layer: layer.backward(dLdy),
                     reversed(self.layers),
                     self.loss_func.backward(),
                 )
+                # update weights
                 for layer in self.layers:
                     layer.update_weights(self.lr)
-        return losses
+
+        loss_per_epoch: NDArray[np.float64] = np.nanmean(loss_per_update, axis=1)
+        loss_per_epoch = loss_per_epoch[~np.isnan(loss_per_epoch)]  # remove nan
+        return loss_per_epoch
 
     def predict(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
         """Predict the labels for a batch of inputs.
