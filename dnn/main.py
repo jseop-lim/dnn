@@ -1,6 +1,9 @@
 import os
+from dataclasses import dataclass, field
 from datetime import datetime
+from enum import Enum
 from pathlib import Path
+from typing import TypedDict
 
 from dnn import layers
 from dnn.data_processors import Dataset, load_dataset
@@ -16,12 +19,44 @@ if not (test_data_path := os.getenv("TEST_DATA_PATH")):
     raise ValueError("TEST_DATA_PATH environment variable is not set")
 
 train_data: Dataset = load_dataset(Path(train_data_path))
-train_data = Dataset(train_data.x[:10000], train_data.r[:10000])  # temp
+# train_data = Dataset(train_data.x[:10000], train_data.r[:10000])  # temp
 test_data: Dataset = load_dataset(Path(test_data_path))
 
 train_data_size, input_size = train_data.x.shape
 test_data_size, _ = test_data.x.shape
 output_size = len(set(train_data.r.flatten()))
+
+
+class ActivationFunction(str, Enum):
+    SIGMOID = "sigmoid"
+    TANH = "tanh"
+    RELU = "relu"
+    SOFTPLUS = "softplus"
+
+
+@dataclass
+class HyperParams:
+    class Meta(TypedDict):  # TODO: 안쓰면 삭제
+        short_name: str
+        to_filename: bool
+
+    lr: float = field(metadata=Meta(short_name="lr", to_filename=True))
+    batch_size: int = field(metadata=Meta(short_name="batch", to_filename=True))
+    hidden_nodes: list[int] = field(metadata=Meta(short_name="nodes", to_filename=True))
+    act_func: ActivationFunction = field(
+        metadata=Meta(short_name="act", to_filename=True)
+    )
+    max_epoch: int = field(metadata=Meta(short_name="maxEpoch", to_filename=False))
+
+    def __str__(self) -> str:
+        return "_".join(
+            [
+                f"lr={self.lr}",
+                f"batch={self.batch_size}",
+                f"nodes={','.join(str(n) for n in self.hidden_nodes)}",
+                f"act={self.act_func.value}",
+            ]
+        )
 
 
 def generate_layers(
