@@ -227,6 +227,8 @@ base_config = HyperParams(
 
 ### 실험 결과
 
+> 가로 축은 epoch 수, 세로 축은 batch 평균 cross-entropy loss입니다.
+
 ![alt text](docs/base.png)
 ![alt text](docs/lr_train.png)
 ![alt text](docs/lr_validate.png)
