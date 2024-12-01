@@ -1,35 +1,51 @@
 # DNN Classifier with mini-batch gradient descent
 
-2020170812 임정섭
+## 지시사항
+
+```markdown
+Classification experiment using DNNs
+
+- Implement a mini-batch SGD algorithm to train the parameters of a DNN.
+- For the following experiments, plot the error graphs for both the training and
+validation data.
+  - Experiment with different learning rates
+  - Experiment with various mini-batch sizes
+  - Experiment with different numbers of nodes and layers (additional 10 points)
+  - Experiment with various types of activation functions (additional 10 points)
+
+This document includes the explanation of the training and validation procedures.
+```
 
 ## 파일 구조
 
 ```plaintext
 .
-├── data  # 데이터셋
-│   ├── test.txt
-│   └── train.txt
+├── data                    # 데이터셋
+│   ├── test.txt
+│   └── train.txt
 ├── dnn
-│   ├── __init__.py
-│   ├── data_processors.py  # 데이터 전처리
-│   ├── experiments.py  # 실험 관리
-│   ├── layers.py  # 신경망 계층 정의
-│   ├── libs.py  # 기본 라이브러리 (numpy import 등)
-│   ├── losses.py  # 손실 함수 정의
-│   ├── main.py  # 실험 실행 entrypoint
-│   ├── metrics.py  # 성능 평가 지표 정의
-│   └── models.py  # 신경망 모델 정의
-├── docs  # README.md에 사용된 이미지 파일 보관
-│   └── ...
-├── logs  # 실험 결과 출력 파일(csv) 보관
-│   └── ...
-├── requirements  # 패키지 의존성 정의
-│   ├── cpu.txt
+│   ├── __init__.py
+│   ├── data_processors.py  # 데이터 전처리
+│   ├── experiments.py      # 실험 관리
+│   ├── layers.py           # 신경망 계층 정의
+│   ├── libs.py             # 기본 라이브러리 (numpy import 등)
+│   ├── losses.py           # 손실 함수 정의
+│   ├── main.py             # 실험 실행 entrypoint
+│   ├── metrics.py          # 성능 평가 지표 정의
+│   └── models.py           # 신경망 모델 정의
+├── tests                   # 테스트 코드
+│   └── ...
+├── docs                    # README.md에 사용된 이미지 파일, 보고서 출력 파일
+│   └── ...
+├── logs                    # 실험 결과 출력 파일(csv)
+│   └── ...
+├── requirements            # 패키지 의존성 정의
+│   ├── cpu.txt
 │   ├── dev.txt
-│   └── gpu.txt
+│   └── gpu.txt
 ├── poetry.lock
 ├── pyproject.toml
-└── README.md
+└── README.md               # 보고서
 ```
 
 ## 실행 방법
