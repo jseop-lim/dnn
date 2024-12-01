@@ -45,7 +45,7 @@ pip install -r requirements/gpu.txt  # Poetry가 없을 경우
 
 CUDA 12.X 이외 버전에는 별도의 패키지를 설치해야 합니다.
 
-> ([CuPy 설치방법 참고](https://docs.cupy.dev/en/v12.3.0/install.html#installing-cupy))
+> [CuPy 설치방법 참고](https://docs.cupy.dev/en/v12.3.0/install.html#installing-cupy)
 
 ```bash
 pip install cupy-cudaxxx  # CUDA 버전에 따라 xxx를 적절히 변경
@@ -65,11 +65,11 @@ python dnn/main.py  # Poetry가 없을 경우
 
 ## 모델 개요
 
-### 데이터셋
+### Dataset
 
 - input x는 D=13차원의 연속형 변수입니다.
-- output y는 K=2개의 클래스를 갖는 범주형 변수입니다.
-- 데이터셋에는 N=60290개의 sample이 존재합니다.
+- label r는 K=2개의 클래스를 갖는 범주형 변수입니다.
+- train dataset에는 N=60290개의 sample이 존재합니다.
 
 ### Inductive Biases
 
