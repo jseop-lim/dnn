@@ -1,5 +1,6 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from functools import reduce
+from typing import NamedTuple
 
 from numpy.typing import NDArray
 
@@ -34,6 +35,11 @@ def train_mini_batch_sgd(
     print("Training complete.")
 
 
+class TrainResult(NamedTuple):
+    train_losses: NDArray[np.float64]
+    validate_losses: NDArray[np.float64] | None
+
+
 # TODO: Model 추상 클래스를 상속받도록 리팩터링
 @dataclass
 class MiniBatchSgdNNClassifier:
@@ -43,47 +49,51 @@ class MiniBatchSgdNNClassifier:
     max_epoch: int
     batch_size: int
     threshold: float = 1e-2
-    # TODO: state 관리 방법 변경
-    validate_data: Dataset | None = None
-    validate_losses: NDArray[np.float64] = field(init=False)  # shape = (max_epoch,)
 
-    def __post_init__(self) -> None:
-        if self.validate_data:
-            self.validate_losses = np.full((self.max_epoch), np.nan)
-
-    def train(self, dataset: Dataset) -> NDArray[np.float64]:
+    def train(
+        self,
+        train_data: Dataset,
+        validate_data: Dataset | None = None,
+    ) -> TrainResult:
         """Train the neural network model using mini-batch stochastic gradient descent.
 
+        Only train_data is involved in parameter determination. If validate_data is given,
+        the loss value for the entire validation_data is measured every epoch.
+
         Args:
-            dataset: The training dataset. x shape = (B, I), r shape = (B, 1)
+            train_data: The training dataset. x shape = (B, I), r shape = (B, 1)
+            validate_data: The validation dataset. x shape = (B, I), r shape = (B, 1)
 
         Returns:
-            losses: The loss values for each epoch. shape = (final_epoch,)
+            train_losses: The loss values for each epoch of training. shape = (max_epoch,)
+            validate_losses: The loss values for each epoch of validation. shape = (max_epoch,)
         """
-        num_batches = len(dataset.x) // self.batch_size + 1
-        loss_per_update = np.full((self.max_epoch, num_batches), np.nan)
+        num_batches = len(train_data.x) // self.batch_size + 1
+        train_loss_per_update = np.full((self.max_epoch, num_batches), np.nan)
+        vaildate_loss_per_epoch = np.full((self.max_epoch), np.nan)
 
         for epoch in range(self.max_epoch):
             for i, batch in enumerate(
-                generate_random_batches(dataset, self.batch_size)
+                generate_random_batches(train_data, self.batch_size)
             ):
-                loss_per_update[epoch, i] = self._feed_forward(batch)
+                train_loss_per_update[epoch, i] = self._feed_forward(batch)
                 # check convergence
-                if loss_per_update[epoch, i] < self.threshold:
+                if train_loss_per_update[epoch, i] < self.threshold:
                     break
 
                 self._error_backprop()
                 self._update_weights()
 
-            # TODO: side effect 제거
-            if self.validate_data:
-                self.validate_losses[epoch] = self._feed_forward(self.validate_data)
+            if validate_data:
+                vaildate_loss_per_epoch[epoch] = self._feed_forward(validate_data)
 
-        loss_per_epoch: NDArray[np.float64] = np.nanmean(loss_per_update, axis=1)
-        # remove nan values
-        loss_per_epoch = loss_per_epoch[~np.isnan(loss_per_epoch)]
-        self.validate_losses = self.validate_losses[~np.isnan(self.validate_losses)]
-        return loss_per_epoch
+        train_loss_per_epoch = np.nanmean(train_loss_per_update, axis=1)
+        return TrainResult(
+            train_loss_per_epoch[~np.isnan(train_loss_per_epoch)],
+            vaildate_loss_per_epoch[~np.isnan(vaildate_loss_per_epoch)]
+            if validate_data
+            else None,
+        )
 
     def predict(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
         """Predict the labels for a batch of inputs.
