@@ -1,4 +1,4 @@
-# COSE362 Machine Learning - DNN Classifier with mini-batch gradient descent
+# DNN Classifier with mini-batch gradient descent
 
 2020170812 임정섭
 
