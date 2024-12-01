@@ -60,17 +60,17 @@ class MiniBatchSgdNNClassifier:
             for i, batch in enumerate(
                 generate_random_batches(dataset, self.batch_size)
             ):
-                loss_per_update[epoch, i] = self.loss_func.forward(
-                    y=self._feed_forward(batch.x), r=batch.r
-                )
+                loss_per_update[epoch, i] = self._feed_forward(batch)
+                # check convergence
                 if loss_per_update[epoch, i] < self.threshold:
                     break
 
-                self._error_backprop(self.loss_func.backward())
+                self._error_backprop()
                 self._update_weights()
 
         loss_per_epoch: NDArray[np.float64] = np.nanmean(loss_per_update, axis=1)
-        loss_per_epoch = loss_per_epoch[~np.isnan(loss_per_epoch)]  # remove nan
+        # remove nan values
+        loss_per_epoch = loss_per_epoch[~np.isnan(loss_per_epoch)]
         return loss_per_epoch
 
     def predict(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
@@ -90,17 +90,22 @@ class MiniBatchSgdNNClassifier:
         )  # shape = (B, 1)
         return predicted_r
 
-    def _feed_forward(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Feed forward for a batch of inputs."""
-        return reduce(lambda x, layer: layer.forward(x), self.layers, x)
+    def _feed_forward(self, batch: Dataset) -> np.float64:
+        """Compute the loss for a batch of inputs."""
+        return self.loss_func.forward(
+            y=reduce(lambda x, layer: layer.forward(x), self.layers, batch.x),
+            r=batch.r,
+        )
 
-    def _error_backprop(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
+    def _error_backprop(self) -> NDArray[np.float64]:
         """Error back-propagation for a batch of inputs."""
         return reduce(
-            lambda dLdy, layer: layer.backward(dLdy), reversed(self.layers), dLdy
+            lambda dLdy, layer: layer.backward(dLdy),
+            reversed(self.layers),
+            self.loss_func.backward(),
         )
 
     def _update_weights(self) -> None:
-        """Update the parameters of the model."""
+        """Update the parameters of all layers."""
         for layer in self.layers:
             layer.update_weights(self.lr)
