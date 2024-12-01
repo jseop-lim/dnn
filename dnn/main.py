@@ -26,22 +26,22 @@ hyperparams = HyperParams(
 # export_result(hyperparams, experiment(hyperparams, train_data, test_data))
 
 """Model Selection"""
-# update iter: 약 1,000,000회
+# update iter: 약 500,000회
 
 # 가변 조건
 lr_list = [1e-4, 1e-3, 1e-2, 1e-1]
 batch_size_list = [1, 32, 64, 128, train_data.x.shape[0]]
-max_epoch_list = [20, 500, 250, 1000000]
-hidden_nodes_list = [[13], [13, 13], [13, 13, 13], [13, 13, 13, 13]]
+max_epoch_list = [10, 250, 125, 500000]
+hidden_nodes_list = [[32], [32, 16], [32, 16, 8], [32, 16, 8, 4]]
 act_func_list = [ActFunc.SIGMOID, ActFunc.RELU, ActFunc.LEAKY_RELU, ActFunc.ELU]
 
 # 불변 조건
 base_config = HyperParams(
     lr=1e-2,
     batch_size=32,
-    hidden_nodes=[13, 13],
+    hidden_nodes=[32, 16],
     act_func=ActFunc.RELU,
-    max_epoch=500,
+    max_epoch=250,
 )
 
 lr_configs = [replace(base_config, lr=lr) for lr in lr_list]
@@ -62,7 +62,7 @@ export_result(base_config, experiment(base_config, train_data, test_data))
 
 # print("Change Learning Rate")
 for config in lr_configs:
-    export_result(config, experiment(config, train_data, test_data))
+    # export_result(config, experiment(config, train_data, test_data))
     pass
 
 # print("Change Batch Size")
