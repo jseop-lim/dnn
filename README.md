@@ -52,7 +52,7 @@ Poetry 활용을 권장합니다.
 
 ```bash
 poetry install  # Poetry가 설치되어 있을 경우
-pip install -r requirements/cpu.txt  # Poetry가 없을 경우
+pip install -r requirements/base.txt  # Poetry가 없을 경우
 ```
 
 #### 2.1 CUDA 환경 구성 (선택)
