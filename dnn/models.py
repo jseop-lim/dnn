@@ -42,7 +42,7 @@ class MiniBatchSgdNNClassifier:
     lr: float
     max_epoch: int
     batch_size: int
-    threshold: float = 1e-3
+    threshold: float = 1e-2
 
     def train(self, dataset: Dataset) -> NDArray[np.float64]:
         """Train the neural network model using mini-batch stochastic gradient descent.
@@ -60,23 +60,14 @@ class MiniBatchSgdNNClassifier:
             for i, batch in enumerate(
                 generate_random_batches(dataset, self.batch_size)
             ):
-                # feed forward
                 loss_per_update[epoch, i] = self.loss_func.forward(
-                    y=reduce(lambda x, layer: layer.forward(x), self.layers, batch.x),
-                    r=batch.r,
+                    y=self._feed_forward(batch.x), r=batch.r
                 )
-                # check convergence
                 if loss_per_update[epoch, i] < self.threshold:
                     break
-                # error back-propagation
-                reduce(
-                    lambda dLdy, layer: layer.backward(dLdy),
-                    reversed(self.layers),
-                    self.loss_func.backward(),
-                )
-                # update weights
-                for layer in self.layers:
-                    layer.update_weights(self.lr)
+
+                self._error_backprop(self.loss_func.backward())
+                self._update_weights()
 
         loss_per_epoch: NDArray[np.float64] = np.nanmean(loss_per_update, axis=1)
         loss_per_epoch = loss_per_epoch[~np.isnan(loss_per_epoch)]  # remove nan
@@ -98,3 +89,18 @@ class MiniBatchSgdNNClassifier:
             -1, 1
         )  # shape = (B, 1)
         return predicted_r
+
+    def _feed_forward(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        """Feed forward for a batch of inputs."""
+        return reduce(lambda x, layer: layer.forward(x), self.layers, x)
+
+    def _error_backprop(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
+        """Error back-propagation for a batch of inputs."""
+        return reduce(
+            lambda dLdy, layer: layer.backward(dLdy), reversed(self.layers), dLdy
+        )
+
+    def _update_weights(self) -> None:
+        """Update the parameters of the model."""
+        for layer in self.layers:
+            layer.update_weights(self.lr)
