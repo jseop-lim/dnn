@@ -88,7 +88,7 @@ selected_config = HyperParams(
     hidden_nodes=[16, 16, 8, 8],
     batch_size=32,
     act_func=ActFunc.RELU,
-    max_epoch=2000,
+    max_epoch=4000,
 )
 final_result = experiment(selected_config, train_data, test_data)
 export_result(selected_config, final_result)

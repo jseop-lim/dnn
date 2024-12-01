@@ -1,0 +1,58 @@
+==== Experiment ====
+Hyperparameters
+- lr: 0.001
+- batch_size: 32
+- hidden_nodes: [16, 16, 8, 8]
+- act_func: ActFunc.RELU
+- max_epoch: 2000
+--------------------
+[2024-12-01 22:26:00] Training started.
+Epoch 1, Train Loss: 1.674834, Validate Loss: 1.133469
+Epoch 51, Train Loss: 0.461176, Validate Loss: 0.457313
+Epoch 101, Train Loss: 0.440820, Validate Loss: 0.443058
+Epoch 151, Train Loss: 0.431270, Validate Loss: 0.421327
+Epoch 201, Train Loss: 0.423726, Validate Loss: 0.421648
+Epoch 251, Train Loss: 0.418572, Validate Loss: 0.413584
+Epoch 301, Train Loss: 0.416361, Validate Loss: 0.414951
+Epoch 351, Train Loss: 0.411442, Validate Loss: 0.410982
+Epoch 401, Train Loss: 0.408545, Validate Loss: 0.408024
+Epoch 451, Train Loss: 0.405726, Validate Loss: 0.395565
+Epoch 501, Train Loss: 0.403908, Validate Loss: 0.395291
+Epoch 551, Train Loss: 0.401259, Validate Loss: 0.390653
+Epoch 601, Train Loss: 0.399127, Validate Loss: 0.388437
+Epoch 651, Train Loss: 0.397845, Validate Loss: 0.389297
+Epoch 701, Train Loss: 0.396406, Validate Loss: 0.399251
+Epoch 751, Train Loss: 0.394653, Validate Loss: 0.386367
+Epoch 801, Train Loss: 0.393079, Validate Loss: 0.382107
+Epoch 851, Train Loss: 0.391519, Validate Loss: 0.385226
+Epoch 901, Train Loss: 0.389970, Validate Loss: 0.379621
+Epoch 951, Train Loss: 0.388851, Validate Loss: 0.383316
+Epoch 1001, Train Loss: 0.388147, Validate Loss: 0.381818
+Epoch 1051, Train Loss: 0.387681, Validate Loss: 0.383625
+Epoch 1101, Train Loss: 0.386313, Validate Loss: 0.417138
+Epoch 1151, Train Loss: 0.385305, Validate Loss: 0.391536
+Epoch 1201, Train Loss: 0.384193, Validate Loss: 0.389595
+Epoch 1251, Train Loss: 0.383486, Validate Loss: 0.375910
+Epoch 1301, Train Loss: 0.382922, Validate Loss: 0.382387
+Epoch 1351, Train Loss: 0.382464, Validate Loss: 0.371493
+Epoch 1401, Train Loss: 0.381614, Validate Loss: 0.379950
+Epoch 1451, Train Loss: 0.381177, Validate Loss: 0.370198
+Epoch 1501, Train Loss: 0.381269, Validate Loss: 0.384620
+Epoch 1551, Train Loss: 0.380687, Validate Loss: 0.386598
+Epoch 1601, Train Loss: 0.379530, Validate Loss: 0.370699
+Epoch 1651, Train Loss: 0.378839, Validate Loss: 0.368594
+Epoch 1701, Train Loss: 0.378436, Validate Loss: 0.376164
+Epoch 1751, Train Loss: 0.380776, Validate Loss: 0.370743
+Epoch 1801, Train Loss: 0.377516, Validate Loss: 0.380656
+Epoch 1851, Train Loss: 0.377525, Validate Loss: 0.379346
+Epoch 1901, Train Loss: 0.376485, Validate Loss: 0.365474
+Epoch 1951, Train Loss: 0.377499, Validate Loss: 0.375558
+[2024-12-01 23:07:33] Training complete.
+--------------------
+[2024-12-01 23:07:33] Prediction started.
+Error rate: 17.83%
+[2024-12-01 23:07:33] Prediction complete.
+--------------------
+Total elapsed time: 0:41:33.521856
+Saved to logs/lr=0.001_batch=32_nodes=16,16,8,8_act=relu_241201-230733_errorRate=0.18.csv
+====================
