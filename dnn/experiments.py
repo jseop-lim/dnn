@@ -99,35 +99,19 @@ def experiment(
         lr=hyperparams.lr,
         batch_size=hyperparams.batch_size,
         max_epoch=hyperparams.max_epoch,
+        validate_data=validate_data,
     )
     train_loss_per_epoch = train_model.train(train_data)
+    validate_loss_per_epoch = train_model.validate_losses
 
     gap = 50
-    for epoch, loss in enumerate(train_loss_per_epoch[::gap]):
-        print(f"Epoch {epoch * gap + 1}, Loss: {loss:.6f}")
+    for epoch, (train_loss, validate_loss) in enumerate(
+        zip(train_loss_per_epoch[::gap], validate_loss_per_epoch[::gap])
+    ):
+        print(
+            f"Epoch {epoch * gap + 1}, Train Loss: {train_loss:.6f}, Validate Loss: {validate_loss:.6f}"
+        )
     print("Training complete.")
-
-    print("--------------------")
-    print("Validation started.")
-
-    validate_model = MiniBatchSgdNNClassifier(
-        layers=generate_layers(
-            input_size,
-            hyperparams.hidden_nodes,
-            output_size,
-            act_class=act_func_map[hyperparams.act_func],
-        ),
-        loss_func=CrossEntropyLoss(),
-        lr=train_model.lr,
-        max_epoch=train_model.max_epoch,
-        batch_size=train_model.batch_size,
-        threshold=train_model.threshold,
-    )
-    validate_loss_per_epoch = validate_model.train(validate_data)
-
-    for epoch, loss in enumerate(validate_loss_per_epoch[::gap]):
-        print(f"Epoch {epoch * gap + 1}, Loss: {loss:.6f}")
-    print("Validation complete.")
 
     print("--------------------")
     print("Prediction started.")
