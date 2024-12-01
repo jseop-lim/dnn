@@ -140,7 +140,7 @@ def export_result(
     metadata_str = "_".join(f"{k}={v}" for k, v in metadata.items())
     now_str = datetime.now().strftime("%y%m%d-%H%M%S")
 
-    result_filepath = f"logs/{hyperparams}_{metadata_str}_{now_str}.csv"
+    result_filepath = f"logs/{hyperparams}_{now_str}_{metadata_str}.csv"
 
     with open(result_filepath, "w") as f:
         f.write("epoch,train_error,validate_error\n")
