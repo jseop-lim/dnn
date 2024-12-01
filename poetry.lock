@@ -218,13 +218,24 @@ test = ["Pillow", "contourpy[test-no-images]", "matplotlib"]
 test-no-images = ["pytest", "pytest-cov", "pytest-rerunfailures", "pytest-xdist", "wurlitzer"]
 
 [[package]]
-name = "cupy"
+name = "cupy-cuda12x"
 version = "13.3.0"
 description = "CuPy: NumPy & SciPy for GPU"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "cupy-13.3.0.tar.gz", hash = "sha256:9a2a17af2b99cce91dd1366939c3805e3f51f9de5046df64f29ccbad3bdf78ed"},
+    {file = "cupy_cuda12x-13.3.0-cp310-cp310-manylinux2014_aarch64.whl", hash = "sha256:674488e990998042cc54d2486d3c37cae80a12ba3787636be5a10b9446dd6914"},
+    {file = "cupy_cuda12x-13.3.0-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:cf4a2a0864364715881b50012927e88bd7ec1e6f1de3987970870861ae5ed25e"},
+    {file = "cupy_cuda12x-13.3.0-cp310-cp310-win_amd64.whl", hash = "sha256:7c0dc8c49d271d1c03e49a5d6c8e42e8fee3114b10f269a5ecc387731d693eaa"},
+    {file = "cupy_cuda12x-13.3.0-cp311-cp311-manylinux2014_aarch64.whl", hash = "sha256:c0cc095b9a3835fd5db66c45ed3c58ecdc5a3bb14e53e1defbfd4a0ce5c8ecdb"},
+    {file = "cupy_cuda12x-13.3.0-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:a0e3bead04e502ebde515f0343444ca3f4f7aed09cbc3a316a946cba97f2ea66"},
+    {file = "cupy_cuda12x-13.3.0-cp311-cp311-win_amd64.whl", hash = "sha256:5f11df1149c7219858b27e4c8be92cb4eaf7364c94af6b78c40dffb98050a61f"},
+    {file = "cupy_cuda12x-13.3.0-cp312-cp312-manylinux2014_aarch64.whl", hash = "sha256:bbd0d916310391faf0d7dc9c58fff7a6dc996b67e5768199160bbceb5ebdda8c"},
+    {file = "cupy_cuda12x-13.3.0-cp312-cp312-manylinux2014_x86_64.whl", hash = "sha256:e206bd8664f0763732b6012431f484ee535bffd77a5ae95e9bfe1c7c72396625"},
+    {file = "cupy_cuda12x-13.3.0-cp312-cp312-win_amd64.whl", hash = "sha256:88ef1478f00ae252da0026e7f04f70c9bb6a2dc130ba5f1e5bc5e8069a928bf5"},
+    {file = "cupy_cuda12x-13.3.0-cp39-cp39-manylinux2014_aarch64.whl", hash = "sha256:3a52aa49ffcc940d034f2bb39728c90e9fa83c7a49e376404507956adb6d6ec4"},
+    {file = "cupy_cuda12x-13.3.0-cp39-cp39-manylinux2014_x86_64.whl", hash = "sha256:3ef13f3cbc449d2a0f816594ab1fa0236e1f06ad1eaa81ad04c75e47cbeb87be"},
+    {file = "cupy_cuda12x-13.3.0-cp39-cp39-win_amd64.whl", hash = "sha256:8f5433eec3e5cd8d39e8fcb82e0fdab7c22eba8e3304fcb0b42f2ea988fef0d6"},
 ]
 
 [package.dependencies]
@@ -1725,4 +1736,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "c7f6a00f1b29c4145d3928dac7073bb00308edc3b0dcb7da2ee3fcf55ae4b75f"
+content-hash = "6d5037578e9ff7635f3de4589dbe15cd653b5ad10467703f9f1c6d81be0b3694"

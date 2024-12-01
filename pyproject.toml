@@ -20,7 +20,7 @@ ipykernel = "^6.29.5"
 
 
 [tool.poetry.group.gpu.dependencies]
-cupy = "^13.3.0"
+cupy-cuda12x = "^13.3.0"
 
 [build-system]
 requires = ["poetry-core"]
