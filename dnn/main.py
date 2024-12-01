@@ -60,24 +60,35 @@ act_func_configs = [
 ]
 
 print("Base Config")
-export_result(base_config, experiment(base_config, train_data, test_data))
+# export_result(base_config, experiment(base_config, train_data, test_data))
 
 print("Change Learning Rate")
 for config in lr_configs:
-    export_result(config, experiment(config, train_data, test_data))
+    # export_result(config, experiment(config, train_data, test_data))
     pass
 
 print("Change Batch Size")
 for config in batch_size_configs:
-    export_result(config, experiment(config, train_data, test_data))
+    # export_result(config, experiment(config, train_data, test_data))
     pass
 
 print("Change Hidden Nodes")
 for config in hidden_nodes_configs:
-    export_result(config, experiment(config, train_data, test_data))
+    # export_result(config, experiment(config, train_data, test_data))
     pass
 
 print("Change Activation Function")
 for config in act_func_configs:
-    export_result(config, experiment(config, train_data, test_data))
+    # export_result(config, experiment(config, train_data, test_data))
     pass
+
+
+selected_config = HyperParams(
+    lr=0.001,
+    hidden_nodes=[16, 16, 8, 8],
+    batch_size=32,
+    act_func=ActFunc.RELU,
+    max_epoch=2000,
+)
+final_result = experiment(selected_config, train_data, test_data)
+export_result(selected_config, final_result)
