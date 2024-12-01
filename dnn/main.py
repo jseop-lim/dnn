@@ -3,7 +3,9 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import TypedDict
+from typing import NamedTuple, TypedDict
+
+from numpy.typing import NDArray
 
 from dnn import layers
 from dnn.data_processors import Dataset, load_dataset
@@ -19,7 +21,7 @@ if not (test_data_path := os.getenv("TEST_DATA_PATH")):
     raise ValueError("TEST_DATA_PATH environment variable is not set")
 
 train_data: Dataset = load_dataset(Path(train_data_path))
-# train_data = Dataset(train_data.x[:10000], train_data.r[:10000])  # temp
+train_data = Dataset(train_data.x[:10000], train_data.r[:10000])  # temp
 test_data: Dataset = load_dataset(Path(test_data_path))
 
 train_data_size, input_size = train_data.x.shape
@@ -83,86 +85,112 @@ def generate_layers(
     return dnn_layers
 
 
-hidden_sizes = [64, 32]
+class ExperimentResult(NamedTuple):
+    train_losses: NDArray[np.float64]
+    validate_losses: NDArray[np.float64]
+    test_error_rate: float
 
-print("Training started.")
 
-train_model = MiniBatchSgdNNClassifier(
-    layers=generate_layers(
-        input_size,
-        hidden_sizes,
-        output_size,
-        act_class=layers.ReLULayer,
-    ),
-    loss_func=CrossEntropyLoss(),
-)
-train_loss_per_epoch = train_model.train(train_data)
+def experiment(
+    hyperparams: HyperParams,
+    train_data: Dataset,
+    test_data: Dataset,
+    validate_data: Dataset | None = None,
+) -> ExperimentResult:
+    validate_data = validate_data or test_data
 
-gap = 50
-for epoch, loss in enumerate(train_loss_per_epoch[::gap]):
-    print(f"Epoch {epoch * gap + 1}, Loss: {loss:.6f}")
-print("Training complete.")
+    _, input_size = train_data.x.shape
+    output_size = len(np.unique(train_data.r))
 
-print("--------------------")
-print("Validation started.")
+    print("Training started.")
 
-validate_model = MiniBatchSgdNNClassifier(
-    layers=generate_layers(
-        input_size,
-        hidden_sizes,
-        output_size,
-        act_class=layers.ReLULayer,
-    ),
-    loss_func=CrossEntropyLoss(),
-    lr=train_model.lr,
-    max_epoch=train_model.max_epoch,
-    batch_size=train_model.batch_size,
-    threshold=train_model.threshold,
-)
-validate_loss_per_epoch = validate_model.train(test_data)
+    train_model = MiniBatchSgdNNClassifier(
+        layers=generate_layers(
+            input_size,
+            hyperparams.hidden_nodes,
+            output_size,
+            act_class=act_func_map[hyperparams.act_func],
+        ),
+        loss_func=CrossEntropyLoss(),
+        lr=hyperparams.lr,
+        batch_size=hyperparams.batch_size,
+        max_epoch=hyperparams.max_epoch,
+    )
+    train_loss_per_epoch = train_model.train(train_data)
 
-for epoch, loss in enumerate(validate_loss_per_epoch[::gap]):
-    print(f"Epoch {epoch * gap + 1}, Loss: {loss:.6f}")
-print("Validation complete.")
+    gap = 50
+    for epoch, loss in enumerate(train_loss_per_epoch[::gap]):
+        print(f"Epoch {epoch * gap + 1}, Loss: {loss:.6f}")
+    print("Training complete.")
 
-print("--------------------")
-print("Prediction started.")
+    print("--------------------")
+    print("Validation started.")
 
-test_predicted_r = train_model.predict(test_data.x).astype(np.uint8)
-test_error_rate: float = compute_error_rate(
-    predicted=test_predicted_r, true=test_data.r
-)
+    validate_model = MiniBatchSgdNNClassifier(
+        layers=generate_layers(
+            input_size,
+            hyperparams.hidden_nodes,
+            output_size,
+            act_class=act_func_map[hyperparams.act_func],
+        ),
+        loss_func=CrossEntropyLoss(),
+        lr=train_model.lr,
+        max_epoch=train_model.max_epoch,
+        batch_size=train_model.batch_size,
+        threshold=train_model.threshold,
+    )
+    validate_loss_per_epoch = validate_model.train(validate_data)
 
-print(f"Error rate: {test_error_rate:.2%}")
-print("Prediction complete.")
+    for epoch, loss in enumerate(validate_loss_per_epoch[::gap]):
+        print(f"Epoch {epoch * gap + 1}, Loss: {loss:.6f}")
+    print("Validation complete.")
+
+    print("--------------------")
+    print("Prediction started.")
+
+    test_predicted_r = train_model.predict(test_data.x).astype(np.uint8)
+    test_error_rate: float = compute_error_rate(
+        predicted=test_predicted_r, true=test_data.r
+    )
+
+    print(f"Error rate: {test_error_rate:.2%}")
+    print("Prediction complete.")
+
+    return ExperimentResult(
+        train_loss_per_epoch, validate_loss_per_epoch, test_error_rate
+    )
 
 
 # Export the training and validation loss values to a CSV file
-hyperparams = {
-    "lr": train_model.lr,
-    "batch": train_model.batch_size,
-    "nodes": ",".join(str(n) for n in hidden_sizes),
-    "act": train_model.layers[1].__class__.__name__.split("Layer")[0].lower()
-    if hidden_sizes
-    else None,
-}
+hyperparams = HyperParams(
+    lr=0.1,
+    max_epoch=100,
+    batch_size=32,
+    hidden_nodes=[64, 32],
+    act_func=ActFunc.RELU,
+)
+
+train_losses, validate_losses, test_error_rate = experiment(
+    hyperparams,
+    train_data,
+    test_data,
+)
 
 metadata = {
     "errorRate": f"{test_error_rate:.2}",
 }
 
-hyperparams_str = "_".join(f"{k}={v}" for k, v in hyperparams.items())
 metadata_str = "_".join(f"{k}={v}" for k, v in metadata.items())
 now_str = datetime.now().strftime("%y%m%d-%H%M%S")
 
-filename = f"{hyperparams_str}_{metadata_str}_{now_str}.csv"
+result_filepath = f"logs/{hyperparams}_{metadata_str}_{now_str}.csv"
 
-with open(f"logs/{filename}", "w") as f:
+with open(result_filepath, "w") as f:
     f.write("epoch,train_error,validate_error\n")
     for epoch, (train_loss, validate_loss) in enumerate(
-        zip(train_loss_per_epoch, validate_loss_per_epoch), 1
+        zip(train_losses, validate_losses), 1
     ):
         f.write(f"{epoch},{train_loss},{validate_loss}\n")
 
 print("--------------------")
-print(f"Saved to logs/{filename}")
+print(f"Saved to {result_filepath}")
