@@ -143,6 +143,52 @@ class ReLULayer(NNLayer):
         return y
 
 
+class LeakyReLULayer(NNLayer):
+    def __init__(self, alpha: float = 0.01) -> None:
+        self.alpha: float = alpha
+
+    def _forward(self) -> NDArray[np.float64]:
+        return self.leaky_relu(self.x)  # shape = (B, I)
+
+    def _backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
+        dLdx: NDArray[np.float64] = (
+            dLdy * (self.x > 0) + dLdy * (self.x <= 0) * self.alpha
+        )
+        return dLdx
+
+    def update_weights(self, lr: float) -> None:
+        pass
+
+    @staticmethod
+    def leaky_relu(x: NDArray[np.float64], alpha: float = 0.01) -> NDArray[np.float64]:
+        """Compute the Leaky ReLU function element-wise."""
+        y: NDArray[np.float64] = np.maximum(alpha * x, x)
+        return y
+
+
+class ELULayer(NNLayer):
+    def __init__(self, alpha: float = 1.0) -> None:
+        self.alpha: float = alpha
+
+    def _forward(self) -> NDArray[np.float64]:
+        return self.elu(self.x)  # shape = (B, I)
+
+    def _backward(self, dLdy: NDArray[np.float64]) -> NDArray[np.float64]:
+        dLdx: NDArray[np.float64] = dLdy * (self.x > 0) + dLdy * (self.x <= 0) * (
+            self.elu(self.x) + self.alpha
+        )
+        return dLdx
+
+    def update_weights(self, lr: float) -> None:
+        pass
+
+    @staticmethod
+    def elu(x: NDArray[np.float64], alpha: float = 1.0) -> NDArray[np.float64]:
+        """Compute the ELU function element-wise."""
+        y: NDArray[np.float64] = np.maximum(alpha * (np.exp(x) - 1), x)
+        return y
+
+
 class SoftmaxLayer(NNLayer):
     def _forward(self) -> NDArray[np.float64]:
         return self.softmax(self.x)  # shape = (B, I)
