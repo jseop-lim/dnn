@@ -39,9 +39,9 @@ def train_mini_batch_sgd(
 class MiniBatchSgdNNClassifier:
     layers: list[NNLayer]  # ordered from deepest hidden layer to output layer
     loss_func: LossFunction
-    lr: float = 0.1
-    max_epoch: int = 100
-    batch_size: int = 32
+    lr: float
+    max_epoch: int
+    batch_size: int
     threshold: float = 1e-3
 
     def train(self, dataset: Dataset) -> NDArray[np.float64]:
