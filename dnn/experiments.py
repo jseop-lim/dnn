@@ -102,7 +102,7 @@ def experiment(
     output_size = len(np.unique(train_data.r))
 
     start_time = datetime.now()
-    print("--------------------")
+    print("==== Experiment ====")
     print("Hyperparameters")
     for key, value in asdict(hyperparams).items():
         print(f"- {key}: {value}")
@@ -175,3 +175,5 @@ def export_result(
             f.write(f"{epoch},{train_loss},{validate_loss}\n")
 
     print(f"Saved to {result_filepath}")
+    print("====================")
+    print()
