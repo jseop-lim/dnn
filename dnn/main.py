@@ -31,7 +31,7 @@ hyperparams = HyperParams(
 lr_list = [1e-4, 1e-3, 1e-2, 1e-1]
 batch_size_list = [1, 32, 64, 128, train_data.x.shape[0]]
 hidden_nodes_list = [[16], [16, 8], [16, 16, 8], [16, 8, 8], [16, 16, 8, 8]]
-act_func_list = [ActFunc.SIGMOID, ActFunc.RELU, ActFunc.LEAKY_RELU, ActFunc.ELU]
+act_func_list = [ActFunc.SIGMOID, ActFunc.RELU, ActFunc.LEAKY_RELU]
 
 # 불변 조건
 base_config = HyperParams(
@@ -44,18 +44,19 @@ base_config = HyperParams(
 
 lr_configs = [
     replace(base_config, lr=lr, max_epoch=max_epoch)
-    for lr, max_epoch in zip(lr_list, [1000, 500, 250, 250])
+    for lr, max_epoch in zip(lr_list, [250, 250, 250, 250])
 ]
 batch_size_configs = [
     replace(base_config, batch_size=batch_size, max_epoch=max_epoch)
-    for batch_size, max_epoch in zip(batch_size_list, [20000, 250, 500, 1000, 1000])
+    for batch_size, max_epoch in zip(batch_size_list, [20000, 100, 125, 1000, 1000])
 ]
 hidden_nodes_configs = [
     replace(base_config, hidden_nodes=hidden_nodes, max_epoch=max_epoch)
-    for hidden_nodes, max_epoch in zip(hidden_nodes_list, [250, 250, 1000, 1000, 2000])
+    for hidden_nodes, max_epoch in zip(hidden_nodes_list, [250, 250, 1000, 1000, 1000])
 ]
 act_func_configs = [
-    replace(base_config, act_func=act_func) for act_func in act_func_list
+    replace(base_config, act_func=act_func, max_epoch=max_epoch)
+    for act_func, max_epoch in zip(act_func_list, [500, 500, 500])
 ]
 
 print("Base Config")
