@@ -66,7 +66,7 @@ class LinearLayer(NNLayer):
     b: NDArray[np.float64]  # shape = (O, 1)
     dLdW: NDArray[np.float64]  # shape = (O, I)
     dLdb: NDArray[np.float64]  # shape = (1, O)
-    # Warning: The shapes of b and dLdb are transposed.
+    # NOTE: The shapes of b and dLdb are transposed.
 
     def __init__(self, input_size: int, output_size: int, std: float = 0.01) -> None:
         """Initialize the weights and biases of the linear layer.
@@ -209,6 +209,3 @@ class SoftmaxLayer(NNLayer):
         y_numerator: NDArray[np.float64] = np.exp(x - x.max(axis=1, keepdims=True))
         y: NDArray[np.float64] = y_numerator / y_numerator.sum(axis=1, keepdims=True)
         return y
-
-
-# DP나 BFS 이용해서 gradient 구하고, 가중치 갱신하자.
