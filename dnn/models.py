@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from functools import reduce
 from typing import NamedTuple
@@ -15,22 +16,22 @@ class TrainResult(NamedTuple):
     validate_losses: NDArray[np.float64] | None
 
 
-# TODO: Model 추상 클래스를 상속받도록 리팩터링
-@dataclass
-class MiniBatchSgdNNClassifier:
-    layers: list[NNLayer]  # ordered from deepest hidden layer to output layer
-    loss_func: LossFunction
-    lr: float
-    max_epoch: int
-    batch_size: int
-    threshold: float = 1e-2
+class MLModel(ABC):
+    """Machine learning model interface.
 
+    Hyperparameters are set in the constructor.
+    """
+
+    @abstractmethod
     def train(
         self,
         train_data: Dataset,
         validate_data: Dataset | None = None,
     ) -> TrainResult:
-        """Train the neural network model using mini-batch stochastic gradient descent.
+        """Train the model using the training dataset.
+
+        The loss is measured per epoch if optimization method is iterative;
+        otherwise, a single loss value is computed.
 
         Only train_data is involved in parameter determination.
         If validate_data is given, the loss value for the entire validation_data is measured every epoch.
@@ -45,6 +46,42 @@ class MiniBatchSgdNNClassifier:
             validate_losses: The loss values for each epoch of validation. shape = (final_epoch,)
                 None if validate_data is not given.
         """
+        raise NotImplementedError
+
+    @abstractmethod
+    def predict(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        """Predict the labels for a batch of inputs.
+
+        Args:
+            x: The input to the model. shape = (B, I)
+
+        Returns:
+            y: The predicted labels. shape = (B, 1)
+        """
+        raise NotImplementedError
+
+
+@dataclass
+class MiniBatchSgdNNClassifier(MLModel):
+    """A neural network classifier trained using mini-batch stochastic gradient descent.
+
+    - task: multi-class classification
+    - architecture: fully connected neural network
+    - optimization: mini-batch stochastic gradient descent
+    """
+
+    layers: list[NNLayer]  # ordered from deepest hidden layer to output layer
+    loss_func: LossFunction
+    lr: float
+    max_epoch: int
+    batch_size: int
+    threshold: float = 1e-2
+
+    def train(
+        self,
+        train_data: Dataset,
+        validate_data: Dataset | None = None,
+    ) -> TrainResult:
         num_batches = len(train_data.x) // self.batch_size + 1
         train_loss_per_update = np.full((self.max_epoch, num_batches), np.nan)
         vaildate_loss_per_epoch = np.full((self.max_epoch), np.nan)
@@ -73,14 +110,6 @@ class MiniBatchSgdNNClassifier:
         )
 
     def predict(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Predict the labels for a batch of inputs.
-
-        Args:
-            x: The input to the model. shape = (B, I)
-
-        Returns:
-            y: The predicted labels. shape = (B, 1)
-        """
         posteriors = reduce(
             lambda x, layer: layer.forward(x), self.layers, x
         )  # shape = (B, O)
