@@ -27,11 +27,21 @@ test_data_size, _ = test_data.x.shape
 output_size = len(set(train_data.r.flatten()))
 
 
-class ActivationFunction(str, Enum):
+class ActFunc(str, Enum):
     SIGMOID = "sigmoid"
     TANH = "tanh"
     RELU = "relu"
     SOFTPLUS = "softplus"
+    LEAKY_RELU = "leakyRelu"
+    ELU = "elu"
+
+
+act_func_map: dict[ActFunc, type[layers.NNLayer]] = {
+    ActFunc.SIGMOID: layers.SigmoidLayer,
+    ActFunc.RELU: layers.ReLULayer,
+    ActFunc.LEAKY_RELU: layers.LeakyReLULayer,
+    ActFunc.ELU: layers.ELULayer,
+}
 
 
 @dataclass
@@ -43,9 +53,7 @@ class HyperParams:
     lr: float = field(metadata=Meta(short_name="lr", to_filename=True))
     batch_size: int = field(metadata=Meta(short_name="batch", to_filename=True))
     hidden_nodes: list[int] = field(metadata=Meta(short_name="nodes", to_filename=True))
-    act_func: ActivationFunction = field(
-        metadata=Meta(short_name="act", to_filename=True)
-    )
+    act_func: ActFunc = field(metadata=Meta(short_name="act", to_filename=True))
     max_epoch: int = field(metadata=Meta(short_name="maxEpoch", to_filename=False))
 
     def __str__(self) -> str:
