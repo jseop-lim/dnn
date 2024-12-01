@@ -6,5 +6,6 @@
     "flake8.args": [
         "--ignore=E203",
         "--max-length=88"
-    ]
+    ],
+    "markdown.extension.toc.levels": "2..3"
 }
