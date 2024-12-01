@@ -161,7 +161,30 @@ def experiment(
     )
 
 
-# Export the training and validation loss values to a CSV file
+def export_result(
+    hyperparams: HyperParams,
+    result: ExperimentResult,
+) -> None:
+    metadata = {
+        "errorRate": f"{result.test_error_rate:.2}",
+    }
+
+    metadata_str = "_".join(f"{k}={v}" for k, v in metadata.items())
+    now_str = datetime.now().strftime("%y%m%d-%H%M%S")
+
+    result_filepath = f"logs/{hyperparams}_{metadata_str}_{now_str}.csv"
+
+    with open(result_filepath, "w") as f:
+        f.write("epoch,train_error,validate_error\n")
+        for epoch, (train_loss, validate_loss) in enumerate(
+            zip(result.train_losses, result.validate_losses), 1
+        ):
+            f.write(f"{epoch},{train_loss},{validate_loss}\n")
+
+    print("--------------------")
+    print(f"Saved to {result_filepath}")
+
+
 hyperparams = HyperParams(
     lr=0.1,
     max_epoch=100,
@@ -169,28 +192,4 @@ hyperparams = HyperParams(
     hidden_nodes=[64, 32],
     act_func=ActFunc.RELU,
 )
-
-train_losses, validate_losses, test_error_rate = experiment(
-    hyperparams,
-    train_data,
-    test_data,
-)
-
-metadata = {
-    "errorRate": f"{test_error_rate:.2}",
-}
-
-metadata_str = "_".join(f"{k}={v}" for k, v in metadata.items())
-now_str = datetime.now().strftime("%y%m%d-%H%M%S")
-
-result_filepath = f"logs/{hyperparams}_{metadata_str}_{now_str}.csv"
-
-with open(result_filepath, "w") as f:
-    f.write("epoch,train_error,validate_error\n")
-    for epoch, (train_loss, validate_loss) in enumerate(
-        zip(train_losses, validate_losses), 1
-    ):
-        f.write(f"{epoch},{train_loss},{validate_loss}\n")
-
-print("--------------------")
-print(f"Saved to {result_filepath}")
+export_result(hyperparams, experiment(hyperparams, train_data, test_data))
