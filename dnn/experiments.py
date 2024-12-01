@@ -1,32 +1,16 @@
-import os
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from pathlib import Path
 from typing import NamedTuple, TypedDict
 
 from numpy.typing import NDArray
 
 from dnn import layers
-from dnn.data_processors import Dataset, load_dataset
+from dnn.data_processors import Dataset
 from dnn.libs import np
 from dnn.losses import CrossEntropyLoss
 from dnn.metrics import compute_error_rate
 from dnn.models import MiniBatchSgdNNClassifier
-
-if not (train_data_path := os.getenv("TRAIN_DATA_PATH")):
-    raise ValueError("TRAIN_DATA_PATH environment variable is not set")
-
-if not (test_data_path := os.getenv("TEST_DATA_PATH")):
-    raise ValueError("TEST_DATA_PATH environment variable is not set")
-
-train_data: Dataset = load_dataset(Path(train_data_path))
-# train_data = Dataset(train_data.x[:10000], train_data.r[:10000])  # temp
-test_data: Dataset = load_dataset(Path(test_data_path))
-
-train_data_size, input_size = train_data.x.shape
-test_data_size, _ = test_data.x.shape
-output_size = len(set(train_data.r.flatten()))
 
 
 class ActFunc(str, Enum):
@@ -183,14 +167,3 @@ def export_result(
 
     print("--------------------")
     print(f"Saved to {result_filepath}")
-
-
-if __name__ == "__main__":
-    hyperparams = HyperParams(
-        lr=0.1,
-        max_epoch=100,
-        batch_size=32,
-        hidden_nodes=[64, 32],
-        act_func=ActFunc.RELU,
-    )
-    export_result(hyperparams, experiment(hyperparams, train_data, test_data))
