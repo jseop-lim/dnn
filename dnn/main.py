@@ -15,7 +15,6 @@ train_data: Dataset = load_dataset(Path(train_data_path))
 test_data: Dataset = load_dataset(Path(test_data_path))
 
 """모델 작동 검사용"""
-# train_data = Dataset(train_data.x[:10000], train_data.r[:10000])  # temp
 hyperparams = HyperParams(
     lr=0.1,
     max_epoch=100,
@@ -23,11 +22,11 @@ hyperparams = HyperParams(
     hidden_nodes=[64, 32],
     act_func=ActFunc.RELU,
 )
+# train_data = Dataset(train_data.x[:10000], train_data.r[:10000])  # temp
 # export_result(hyperparams, experiment(hyperparams, train_data, test_data))
 
-"""Model Selection"""
-# update iter: 약 500,000회
 
+"""Model Selection"""
 # 가변 조건
 lr_list = [1e-4, 1e-3, 1e-2, 1e-1]
 batch_size_list = [1, 32, 64, 128, train_data.x.shape[0]]
@@ -49,7 +48,7 @@ lr_configs = [
 ]
 batch_size_configs = [
     replace(base_config, batch_size=batch_size, max_epoch=max_epoch)
-    for batch_size, max_epoch in zip(batch_size_list, [500, 250, 500, 1000, 1000])
+    for batch_size, max_epoch in zip(batch_size_list, [20000, 250, 500, 1000, 1000])
 ]
 hidden_nodes_configs = [
     replace(base_config, hidden_nodes=hidden_nodes, max_epoch=max_epoch)
@@ -62,22 +61,22 @@ act_func_configs = [
 print("Base Config")
 export_result(base_config, experiment(base_config, train_data, test_data))
 
-# print("Change Learning Rate")
+print("Change Learning Rate")
 for config in lr_configs:
-    # export_result(config, experiment(config, train_data, test_data))
+    export_result(config, experiment(config, train_data, test_data))
     pass
 
-# print("Change Batch Size")
+print("Change Batch Size")
 for config in batch_size_configs:
-    # export_result(config, experiment(config, train_data, test_data))
+    export_result(config, experiment(config, train_data, test_data))
     pass
 
-# print("Change Hidden Nodes")
+print("Change Hidden Nodes")
 for config in hidden_nodes_configs:
-    # export_result(config, experiment(config, train_data, test_data))
+    export_result(config, experiment(config, train_data, test_data))
     pass
 
-# print("Change Activation Function")
+print("Change Activation Function")
 for config in act_func_configs:
-    # export_result(config, experiment(config, train_data, test_data))
+    export_result(config, experiment(config, train_data, test_data))
     pass
