@@ -99,10 +99,11 @@ def experiment(
         lr=hyperparams.lr,
         batch_size=hyperparams.batch_size,
         max_epoch=hyperparams.max_epoch,
-        validate_data=validate_data,
     )
-    train_loss_per_epoch = train_model.train(train_data)
-    validate_loss_per_epoch = train_model.validate_losses
+    train_loss_per_epoch, validate_loss_per_epoch = train_model.train(
+        train_data, validate_data
+    )
+    assert validate_loss_per_epoch is not None
 
     gap = 50
     for epoch, (train_loss, validate_loss) in enumerate(
