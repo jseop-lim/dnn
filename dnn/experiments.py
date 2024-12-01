@@ -86,7 +86,9 @@ def experiment(
     _, input_size = train_data.x.shape
     output_size = len(np.unique(train_data.r))
 
-    print("Training started.")
+    start_time = datetime.now()
+    print("--------------------")
+    print(f"[{datetime.now():%Y-%m-%d %H:%M:%S}] Training started.")
 
     train_model = MiniBatchSgdNNClassifier(
         layers=generate_layers(
@@ -112,10 +114,10 @@ def experiment(
         print(
             f"Epoch {epoch * gap + 1}, Train Loss: {train_loss:.6f}, Validate Loss: {validate_loss:.6f}"
         )
-    print("Training complete.")
+    print(f"[{datetime.now():%Y-%m-%d %H:%M:%S}] Training complete.")
 
     print("--------------------")
-    print("Prediction started.")
+    print(f"[{datetime.now():%Y-%m-%d %H:%M:%S}] Prediction started.")
 
     test_predicted_r = train_model.predict(test_data.x).astype(np.uint8)
     test_error_rate: float = compute_error_rate(
@@ -123,7 +125,9 @@ def experiment(
     )
 
     print(f"Error rate: {test_error_rate:.2%}")
-    print("Prediction complete.")
+    print(f"[{datetime.now():%Y-%m-%d %H:%M:%S}] Prediction complete.")
+    print("--------------------")
+    print(f"Total elapsed time: {datetime.now() - start_time}")
 
     return ExperimentResult(
         train_loss_per_epoch, validate_loss_per_epoch, test_error_rate
@@ -150,5 +154,4 @@ def export_result(
         ):
             f.write(f"{epoch},{train_loss},{validate_loss}\n")
 
-    print("--------------------")
     print(f"Saved to {result_filepath}")
