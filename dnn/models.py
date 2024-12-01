@@ -67,6 +67,7 @@ class MiniBatchSgdNNClassifier:
         Returns:
             train_losses: The loss values for each epoch of training. shape = (max_epoch,)
             validate_losses: The loss values for each epoch of validation. shape = (max_epoch,)
+                None if validate_data is not given.
         """
         num_batches = len(train_data.x) // self.batch_size + 1
         train_loss_per_update = np.full((self.max_epoch, num_batches), np.nan)
