@@ -10,31 +10,6 @@ from dnn.libs import np
 from dnn.losses import LossFunction
 
 
-# Deprecated
-def train_mini_batch_sgd(
-    models: list[NNLayer],
-    loss: LossFunction,
-    dataset: Dataset,
-    lr: float,
-    max_epoch: int,
-    batch_size: int,
-) -> None:
-    """Train the neural network model using mini-batch stochastic gradient descent."""
-    for epoch in range(max_epoch):
-        for batch in generate_random_batches(dataset, batch_size):
-            x, r = batch
-            # TODO: reduce로 리팩터링
-            for model in models:
-                x = model.forward(x)
-            loss_value = loss.forward(x, r)
-            grad = loss.backward()
-            for model in reversed(models):
-                grad = model.backward(grad)
-                model.update_weights(lr)
-            print(f"Epoch {epoch + 1}, Loss: {loss_value}")
-    print("Training complete.")
-
-
 class TrainResult(NamedTuple):
     train_losses: NDArray[np.float64]
     validate_losses: NDArray[np.float64] | None
