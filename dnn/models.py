@@ -57,16 +57,17 @@ class MiniBatchSgdNNClassifier:
     ) -> TrainResult:
         """Train the neural network model using mini-batch stochastic gradient descent.
 
-        Only train_data is involved in parameter determination. If validate_data is given,
-        the loss value for the entire validation_data is measured every epoch.
+        Only train_data is involved in parameter determination.
+        If validate_data is given, the loss value for the entire validation_data is measured every epoch.
+        Final epoch is determined by the convergence threshold or max_epoch.
 
         Args:
             train_data: The training dataset. x shape = (B, I), r shape = (B, 1)
             validate_data: The validation dataset. x shape = (B, I), r shape = (B, 1)
 
         Returns:
-            train_losses: The loss values for each epoch of training. shape = (max_epoch,)
-            validate_losses: The loss values for each epoch of validation. shape = (max_epoch,)
+            train_losses: The loss values for each epoch of training. shape = (final_epoch,)
+            validate_losses: The loss values for each epoch of validation. shape = (final_epoch,)
                 None if validate_data is not given.
         """
         num_batches = len(train_data.x) // self.batch_size + 1
