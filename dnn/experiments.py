@@ -21,7 +21,7 @@ if not (test_data_path := os.getenv("TEST_DATA_PATH")):
     raise ValueError("TEST_DATA_PATH environment variable is not set")
 
 train_data: Dataset = load_dataset(Path(train_data_path))
-train_data = Dataset(train_data.x[:10000], train_data.r[:10000])  # temp
+# train_data = Dataset(train_data.x[:10000], train_data.r[:10000])  # temp
 test_data: Dataset = load_dataset(Path(test_data_path))
 
 train_data_size, input_size = train_data.x.shape
