@@ -1,7 +1,7 @@
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from enum import Enum
-from typing import NamedTuple, TypedDict
+from typing import NamedTuple
 
 from numpy.typing import NDArray
 
@@ -13,7 +13,7 @@ from dnn.metrics import compute_error_rate
 from dnn.models import MiniBatchSgdNNClassifier
 
 
-class ActFunc(str, Enum):
+class ActFunc(Enum):
     SIGMOID = "sigmoid"
     TANH = "tanh"
     RELU = "relu"
@@ -32,15 +32,11 @@ act_func_map: dict[ActFunc, type[layers.NNLayer]] = {
 
 @dataclass
 class HyperParams:
-    class Meta(TypedDict):  # TODO: 안쓰면 삭제
-        short_name: str
-        to_filename: bool
-
-    lr: float = field(metadata=Meta(short_name="lr", to_filename=True))
-    batch_size: int = field(metadata=Meta(short_name="batch", to_filename=True))
-    hidden_nodes: list[int] = field(metadata=Meta(short_name="nodes", to_filename=True))
-    act_func: ActFunc = field(metadata=Meta(short_name="act", to_filename=True))
-    max_epoch: int = field(metadata=Meta(short_name="maxEpoch", to_filename=False))
+    lr: float
+    batch_size: int
+    hidden_nodes: list[int]
+    act_func: ActFunc
+    max_epoch: int
 
     def __str__(self) -> str:
         return "_".join(
@@ -87,6 +83,11 @@ def experiment(
     output_size = len(np.unique(train_data.r))
 
     start_time = datetime.now()
+    print("--------------------")
+    print("Hyperparameters")
+    for key, value in asdict(hyperparams).items():
+        print(f"- {key}: {value}")
+
     print("--------------------")
     print(f"[{datetime.now():%Y-%m-%d %H:%M:%S}] Training started.")
 
