@@ -185,11 +185,12 @@ def export_result(
     print(f"Saved to {result_filepath}")
 
 
-hyperparams = HyperParams(
-    lr=0.1,
-    max_epoch=100,
-    batch_size=32,
-    hidden_nodes=[64, 32],
-    act_func=ActFunc.RELU,
-)
-export_result(hyperparams, experiment(hyperparams, train_data, test_data))
+if __name__ == "__main__":
+    hyperparams = HyperParams(
+        lr=0.1,
+        max_epoch=100,
+        batch_size=32,
+        hidden_nodes=[64, 32],
+        act_func=ActFunc.RELU,
+    )
+    export_result(hyperparams, experiment(hyperparams, train_data, test_data))
