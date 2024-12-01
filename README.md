@@ -31,6 +31,8 @@ pip install -r requirements/cpu.txt  # Poetry가 없을 경우
 
 #### 2.1 CUDA 환경 구성 (선택)
 
+> 학습 속도가 느려서 추천하지 않습니다.
+
 ```bash
 export DEVICE="gpu"
 ```
