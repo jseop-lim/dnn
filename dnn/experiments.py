@@ -1,6 +1,7 @@
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from enum import Enum
+from math import sqrt
 from typing import NamedTuple
 
 from numpy.typing import NDArray
@@ -49,17 +50,35 @@ class HyperParams:
         )
 
 
+def get_init_std(act_class: type[layers.NNLayer], input_size: int) -> float:
+    match act_class:
+        case layers.SigmoidLayer:
+            return 1 / sqrt(input_size)
+        case layers.ReLULayer | layers.LeakyReLULayer | layers.ELULayer:
+            return 1 / sqrt(input_size / 2)
+        case _:
+            return 1 / sqrt(input_size)
+
+
 def generate_layers(
     input_size: int,
     hidden_sizes: list[int],
     output_size: int,
     act_class: type[layers.NNLayer],
 ) -> list[layers.NNLayer]:
-    dnn_layers: list[layers.NNLayer] = [layers.LinearLayer(input_size, hidden_sizes[0])]
+    dnn_layers: list[layers.NNLayer] = [
+        layers.LinearLayer(
+            input_size,
+            hidden_sizes[0],
+            std=get_init_std(act_class, input_size),
+        )
+    ]
 
     for i_size, o_size in zip(hidden_sizes[:-1], hidden_sizes[1:] + [output_size]):
         dnn_layers.append(act_class())
-        dnn_layers.append(layers.LinearLayer(i_size, o_size))
+        dnn_layers.append(
+            layers.LinearLayer(i_size, o_size, std=get_init_std(act_class, i_size))
+        )
 
     dnn_layers.append(layers.SoftmaxLayer())
     return dnn_layers
