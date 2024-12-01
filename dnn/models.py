@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import reduce
 
 from numpy.typing import NDArray
@@ -43,6 +43,13 @@ class MiniBatchSgdNNClassifier:
     max_epoch: int
     batch_size: int
     threshold: float = 1e-2
+    # TODO: state 관리 방법 변경
+    validate_data: Dataset | None = None
+    validate_losses: NDArray[np.float64] = field(init=False)  # shape = (max_epoch,)
+
+    def __post_init__(self) -> None:
+        if self.validate_data:
+            self.validate_losses = np.full((self.max_epoch), np.nan)
 
     def train(self, dataset: Dataset) -> NDArray[np.float64]:
         """Train the neural network model using mini-batch stochastic gradient descent.
@@ -68,9 +75,14 @@ class MiniBatchSgdNNClassifier:
                 self._error_backprop()
                 self._update_weights()
 
+            # TODO: side effect 제거
+            if self.validate_data:
+                self.validate_losses[epoch] = self._feed_forward(self.validate_data)
+
         loss_per_epoch: NDArray[np.float64] = np.nanmean(loss_per_update, axis=1)
         # remove nan values
         loss_per_epoch = loss_per_epoch[~np.isnan(loss_per_epoch)]
+        self.validate_losses = self.validate_losses[~np.isnan(self.validate_losses)]
         return loss_per_epoch
 
     def predict(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
