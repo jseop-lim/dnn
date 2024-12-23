@@ -261,6 +261,6 @@ Saved to logs/lr=0.001_batch=32_nodes=16,16,8,8_act=relu_241201-233307_errorRate
 ====================
 ```
 
-test.txt의 검증 데이터셋에 대한 error rate를 측정한 결과는 16.78%입니다. EM 알고리즘의 15.18%보다 높은 error rate를 보입니다.
+test.txt의 검증 데이터셋에 대한 error rate를 측정한 결과는 16.78%입니다. [EM 알고리즘](https://github.com/jseop-lim/em)의 15.18%보다 높은 error rate를 보입니다.
 
 이는 데이터셋의 크기가 작고, DNN 모델의 복잡도가 높아서 발생한 것으로 보입니다. 또한, 모델 선택에서 모든 경우를 고려하지 않았기 때문에, 최적의 hyperparameter 조합을 찾지 못했을 가능성이 있습니다.
