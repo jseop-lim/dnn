@@ -1,6 +1,5 @@
 # DNN Classifier with mini-batch gradient descent
 
-- [지시사항](#지시사항)
 - [파일 구조](#파일-구조)
 - [실행 방법](#실행-방법)
   - [1. 환경변수 설정](#1-환경변수-설정)
@@ -15,22 +14,6 @@
   - [실험 방법](#실험-방법)
   - [실험 결과](#실험-결과)
 - [성능 평가](#성능-평가)
-
-## 지시사항
-
-```markdown
-Classification experiment using DNNs
-
-- Implement a mini-batch SGD algorithm to train the parameters of a DNN.
-- For the following experiments, plot the error graphs for both the training and
-validation data.
-  - Experiment with different learning rates
-  - Experiment with various mini-batch sizes
-  - Experiment with different numbers of nodes and layers (additional 10 points)
-  - Experiment with various types of activation functions (additional 10 points)
-
-This document includes the explanation of the training and validation procedures.
-```
 
 ## 파일 구조
 
